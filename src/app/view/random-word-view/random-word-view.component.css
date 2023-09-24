@@ -1,0 +1,22 @@
+.char-input {
+  background: var(--darkblack);
+  color: var(--white);
+  font-weight: 900;
+  border: none;
+  padding: 0 var(--boxSide);
+  font-size: 24px;
+
+  color: var(--white);
+  background: var(--darkblack);
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  text-align: center;
+  line-height: 2.5rem;
+  font-weight: 900;
+  font-size: 24px;
+  border: none;
+  caret-color: transparent;
+
+  grid-row: 0;
+}
