@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { RandomWordService } from 'src/app/services/RandomWordService/random-word.service';
+import { RandomWordService } from 'src/app/services/random-word.service';
 
 @Component({
-  selector: 'app-random-word-view',
-  templateUrl: './random-word-view.component.html',
-  styleUrls: ['./random-word-view.component.css'],
+  selector: 'app-game-page',
+  templateUrl: './game-page.component.html',
+  styleUrls: ['./game-page.component.css'],
 })
-export class RandomWordViewComponent {
+export class GamePageComponent {
   //properties
   public _randomWord: string[] = [];
 

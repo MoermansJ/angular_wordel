@@ -3,11 +3,22 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
-import { RandomWordViewComponent } from './view/random-word-view/random-word-view.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { GamePageComponent } from './pages/game-page/game-page.component';
+import { HamburgerButtonComponent } from './components/hamburger-button/hamburger-button.component';
+import { AppRoutingModule } from './app-routing.module';
+import { ContactPageComponent } from './pages/contact-page/contact-page.component';
+import { HamburgerMenuComponent } from './components/hamburger-menu/hamburger-menu.component';
 
 @NgModule({
-  declarations: [AppComponent, RandomWordViewComponent],
-  imports: [BrowserModule, HttpClientModule],
+  declarations: [
+    AppComponent,
+    GamePageComponent,
+    ContactPageComponent,
+    HamburgerButtonComponent,
+    HamburgerMenuComponent,
+  ],
+  imports: [BrowserModule, HttpClientModule, NgbModule, AppRoutingModule],
   providers: [],
   bootstrap: [AppComponent],
 })

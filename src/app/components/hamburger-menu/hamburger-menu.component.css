@@ -1,0 +1,10 @@
+#hamburger-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+#hamburger-menu .button {
+  padding: 1rem;
+  border: 1px solid black;
+  width: fit-content;
+}
