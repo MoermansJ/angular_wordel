@@ -1,7 +1,13 @@
-<p>{{randomWord}}</p>
+<div id="game">
+    <p>{{randomWord}}</p>
 
-<div id="input-container">
-    <input *ngFor="let char of randomWord; let i = index" class="char-input" type="text" maxlength="1"
-        [style.grid-column]="'${i + 1}'" />
-    <!-- to do: fix grid -->
+    <div id="word-grid">
+        <input *ngFor="let char of randomWordCharArray; let i = index" class="char-input" id="char-input-{{i}}"
+            type="text" maxlength="1" [style.grid-column]="'${i++}'" [(ngModel)]="inputValues[i]"
+            (keydown)="jumpToNextOrPrevious($event, i)" />
+        <button id="word-button" (click)="handleCheck()"
+            [style.grid-column]="randomWordCharArray.length + 1">CHECK</button>
+    </div>
+
+    <div id="external-html">{{wordDetails}}</div>
 </div>

@@ -1,15 +1,18 @@
-<div *ngIf="showLoadScreen" id="loading-screen">
-    <!-- You can add a loading animation or message here -->
-    <div id="loading-screen-logo">
-        <div>L</div>
-        <div>O</div>
-        <div>A</div>
-        <div>D</div>
-        <div>I</div>
-        <div>N</div>
-        <div>G</div>
-    </div>
-</div>
+<div id="app">
 
-<app-hamburger-button />
-<router-outlet />
+    <!-- <div *ngIf="showLoadScreen" id="loading-screen">
+        <div id="loading-screen-logo">
+            <div>L</div>
+            <div>O</div>
+            <div>A</div>
+            <div>D</div>
+            <div>I</div>
+            <div>N</div>
+            <div>G</div>
+        </div>
+    </div> -->
+
+    <app-hamburger-button />
+    <router-outlet />
+
+</div>

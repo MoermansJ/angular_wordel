@@ -9,6 +9,7 @@ import { HamburgerButtonComponent } from './components/hamburger-button/hamburge
 import { AppRoutingModule } from './app-routing.module';
 import { ContactPageComponent } from './pages/contact-page/contact-page.component';
 import { HamburgerMenuComponent } from './components/hamburger-menu/hamburger-menu.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,13 @@ import { HamburgerMenuComponent } from './components/hamburger-menu/hamburger-me
     HamburgerButtonComponent,
     HamburgerMenuComponent,
   ],
-  imports: [BrowserModule, HttpClientModule, NgbModule, AppRoutingModule],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    NgbModule,
+    AppRoutingModule,
+    FormsModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

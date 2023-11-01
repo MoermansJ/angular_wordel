@@ -1,6 +1,20 @@
 :root {
-  --white: #fffdff;
+  /* OLD */
+  /* --white: #fffdff;
   --black: #3a3a3c;
   --darkblack: #131314;
-  --boxSide: 20px;
+  --boxSide: 20px; */
+
+  /* NEW */
+  /* --background-primary: #1a1a1a;
+  --background-secondary: #333;
+  --text-primary: rgb(255, 255, 255);
+  --text-secondary: #aaa;
+  --accent-color: #3498db;
+  --accent-text: #fff;
+  --link-color: #4caf50;
+  --link-hover-color: #388e3c;
+  --error-color: #e74c3c;
+  --warning-color: #f39c12;
+  --success-color: #2ecc71; */
 }

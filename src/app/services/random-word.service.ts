@@ -11,11 +11,12 @@ export class RandomWordService {
 
   //custom methods
   public fetchWordBeginningWith(randomCharacter: string): Observable<string> {
-    const url =
-      'https://scrabble.collinsdictionary.com/word-lists/five-letter-words-beginning-with-' +
-      randomCharacter +
-      '/';
+    const url = `https://scrabble.collinsdictionary.com/word-lists/five-letter-words-beginning-with-${randomCharacter}/`;
+    return this.http.get(url, { responseType: 'text' });
+  }
 
+  public fetchWordDetails(word: string): Observable<string> {
+    const url = `https://www.woorden.org/woord/${word}`;
     return this.http.get(url, { responseType: 'text' });
   }
 }

@@ -1,6 +1,28 @@
+#game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--background-primary);
+  color: var(--text-primary);
+  height: 100%;
+}
+
+#word-grid {
+  display: grid;
+  grid-template-columns: auto minmax(auto, 1fr) auto;
+  gap: 0.3rem; /* Adjust the gap between columns */
+  text-align: center;
+}
+
+#word-button {
+  grid-column: 6;
+}
+
 .char-input {
-  background: var(--darkblack);
-  color: var(--white);
+  /* background: var(--background-secondary); */
+  background: black;
+  /* color: var(--white); */
+  color: white;
   font-weight: 900;
   border: none;
   width: 40px;
@@ -10,5 +32,5 @@
   text-align: center;
   line-height: 2.5rem;
   caret-color: transparent;
-  grid-row: 0;
+  grid-row: 1;
 }
