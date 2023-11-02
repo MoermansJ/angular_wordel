@@ -1,85 +1,68 @@
-import { Component, ElementRef, Renderer2 } from '@angular/core';
-import { RandomWordService } from 'src/app/services/random-word.service';
+import { HttpClient } from '@angular/common/http';
+import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { Observable } from 'rxjs';
+import { GameService } from 'src/app/services/game.service';
+import { WordService } from 'src/app/services/word.service';
 
 @Component({
   selector: 'app-game-page',
   templateUrl: './game-page.component.html',
   styleUrls: ['./game-page.component.css'],
 })
-export class GamePageComponent {
+export class GamePageComponent implements OnInit {
   //properties
-  public randomWordCharArray: string[] = [];
-  public randomWord: string = '';
+  public computerWordCharArray: string[] = [];
+  public computerWord: string = '';
+  public userWord: string = '';
   public wordDetails: Element | null = null;
   public inputValues: string[] = [];
-  private attemptCounter: number = 7;
+  public attemptCounter: number = 7;
 
   //constructor
   public constructor(
-    private randomWordService: RandomWordService,
     private renderer: Renderer2,
-    private el: ElementRef
+    private el: ElementRef,
+    private gameService: GameService,
+    private http: HttpClient
   ) {}
 
   //custom methods
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.getRandomWord();
   }
 
   public getRandomWord(): void {
-    const randomIndex = (array: any): number => {
-      return Math.floor(Math.random() * array.length);
-    };
+    const randomIndex = (array: any): number =>
+      Math.floor(Math.random() * array.length);
     const alphabet: string = 'abcdefghijklmnopqrstuvwxyz';
     const randomChar: string = alphabet.charAt(randomIndex(alphabet));
 
-    this.randomWordService.fetchWordBeginningWith(randomChar).subscribe({
+    this.fetchWordBeginningWith(randomChar).subscribe({
       next: (response: string) => {
         let parsedHTML = new DOMParser().parseFromString(response, 'text/html');
         const fiveLetterWords = Array.from(
           parsedHTML.querySelector('.letter_table')?.children as HTMLCollection
         ).filter((element) => element.textContent?.length == 5);
 
-        this.randomWord = fiveLetterWords[randomIndex(fiveLetterWords)]
+        this.computerWord = fiveLetterWords[randomIndex(fiveLetterWords)]
           .textContent as string;
-        this.randomWordCharArray = [...this.randomWord];
 
-        // this.getWordDetails(this.randomWord);
+        this.computerWordCharArray = Array.from(this.computerWord);
       },
-
-      error: (error) => console.log(error),
-    });
-  }
-
-  public getWordDetails(word: string): void {
-    this.randomWordService.fetchWordDetails(word).subscribe({
-      next: (response: string) => {
-        let parsedHTML = new DOMParser().parseFromString(response, 'text/html');
-        const externalHTML = Array.from(
-          parsedHTML.querySelector('.right')?.children as HTMLCollection
-        )[1];
-        this.wordDetails = externalHTML;
-        console.log('fetched details', this.wordDetails);
-
-        const targetElement = this.renderer.selectRootElement('#external-html');
-
-        //clearing previous html
-        this.renderer.setProperty(targetElement, 'innerHTML', '');
-
-        //appending html
-        this.renderer.appendChild(targetElement, externalHTML);
-      },
-
-      error: (error) => console.log(error),
+      error: (error: any) => console.log(error),
     });
   }
 
   public handleCheck(): void {
     //if user hasn't entered enough characters
-    if (this.inputValues.length != this.randomWordCharArray.length) {
+    if (
+      this.inputValues.filter((string) => string.trim().length > 0).length !=
+      this.computerWord.length
+    ) {
       return;
     }
 
+    //creating div elements based on user word
     this.attemptCounter--;
     const wordGrid = this.el.nativeElement.querySelector('#word-grid');
 
@@ -91,51 +74,102 @@ export class GamePageComponent {
       this.renderer.appendChild(wordGrid, divToAppend);
     }
 
+    //resetting input fields for UX
+
+    //painting user word div elements
+    this.gameService.appendUserWord(
+      this.inputValues.join(''),
+      this.attemptCounter
+    );
+
+    this.gameService.paintAppendedWord(
+      this.attemptCounter,
+      this.inputValues.join(''),
+      this.computerWord
+    );
+
     this.inputValues = [];
+
+    // const targetElement = this.renderer.selectRootElement(
+    //   '#external-html'
+    // ) as HTMLElement;
+
+    // //clearing previous html
+    // this.renderer.setProperty(targetElement, 'innerHTML', '');
+
+    //appending html
+    // this.renderer.appendChild(
+    //   targetElement,
+    //   this.wordService.getWordDetails(this.computerWord)
+    // );
+  }
+
+  private fetchWordBeginningWith(randomCharacter: string): Observable<string> {
+    const url = `https://scrabble.collinsdictionary.com/word-lists/five-letter-words-beginning-with-${randomCharacter}/`;
+    return this.http.get(url, { responseType: 'text' });
   }
 
   public jumpToNextOrPrevious(event: Event, currentIndex: number): void {
     const key = (event as KeyboardEvent).key.toUpperCase();
     const currentElement = event.target as HTMLInputElement;
-    event.preventDefault();
 
+    switch (key) {
+      case 'BACKSPACE':
+      case 'DELETE':
+        this.jumpToPrevious(key, currentElement, currentIndex);
+        break;
+      default:
+        this.jumpToNext(key, currentElement, currentIndex);
+    }
+  }
+
+  private jumpToPrevious(
+    key: string,
+    element: HTMLInputElement,
+    elementIndex: number
+  ): void {
     //going backward
     if (key === 'BACKSPACE' || key === 'DELETE') {
-      currentElement.value = '';
+      // element.value = '';
 
-      if (currentIndex <= 0) {
+      if (elementIndex <= 0) {
         return;
       }
 
-      if (currentElement.value !== '') {
-        currentElement.value = '';
-        return;
-      }
+      // if (element.value !== '') {
+      //   element.value = '';
+      //   return;
+      // }
 
-      const previousInputId = 'char-input-' + (currentIndex - 1);
+      const previousInputId = 'char-input-' + (elementIndex - 1);
       const previousInput = document.getElementById(
         previousInputId
       ) as HTMLInputElement;
 
       previousInput.focus();
-      return;
     }
+  }
 
+  private jumpToNext(
+    key: string,
+    element: HTMLInputElement,
+    elementIndex: number
+  ): void {
     //check if the pressed key matches regex AND pressed key is a character
     const regex: RegExp = /[A-Z]/; //A - Z
     if (!regex.test(key) || key.length >= 2) {
       return;
     }
 
-    currentElement.value = key;
+    // element.value = key;
 
-    if (currentIndex >= this.randomWord.length - 1) {
+    if (elementIndex === this.computerWord.length - 1) {
       return;
     }
 
     //shifting focus
     const nextInput = document.getElementById(
-      'char-input-' + (currentIndex + 1)
+      'char-input-' + (elementIndex + 1)
     ) as HTMLInputElement;
     nextInput.focus();
   }

@@ -1,12 +1,14 @@
 <div id="game">
-    <p>{{randomWord}}</p>
+    <p>{{computerWord}}</p>
 
     <div id="word-grid">
-        <input *ngFor="let char of randomWordCharArray; let i = index" class="char-input" id="char-input-{{i}}"
-            type="text" maxlength="1" [style.grid-column]="'${i++}'" [(ngModel)]="inputValues[i]"
-            (keydown)="jumpToNextOrPrevious($event, i)" />
+        <input *ngFor="let char of computerWordCharArray; let i = index; attemptCounter" class="char-input"
+            id="char-input-{{i}}" type="text" maxlength="1" [style.grid-column]="'${i++}'" [(ngModel)]="inputValues[i]"
+            (keyup)="jumpToNextOrPrevious($event, i)" />
+
+
         <button id="word-button" (click)="handleCheck()"
-            [style.grid-column]="randomWordCharArray.length + 1">CHECK</button>
+            [style.grid-column]="computerWordCharArray.length + 1">CHECK</button>
     </div>
 
     <div id="external-html">{{wordDetails}}</div>

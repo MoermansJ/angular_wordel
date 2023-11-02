@@ -14,10 +14,6 @@
   text-align: center;
 }
 
-#word-button {
-  grid-column: 6;
-}
-
 .char-input {
   /* background: var(--background-secondary); */
   background: black;
