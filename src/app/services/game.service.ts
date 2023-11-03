@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { WordService } from './word.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,8 +13,7 @@ export class GameService {
   public appendUserWord(word: string, attemptNumber: number): void {
     const wordGrid = document.getElementById('word-grid');
 
-    console.log('word', word);
-
+    //creating divs for individual letters
     for (let i = 0; i < word.length; i++) {
       const divToAppend = document.createElement('div') as HTMLDivElement;
       divToAppend.textContent = word[i];
@@ -31,20 +29,54 @@ export class GameService {
     userWord: string,
     computerWord: string
   ): void {
-    userWord = userWord.toUpperCase();
     const userWordHtml = document.getElementsByClassName(
       'user-attempt-' + attemptNumber
     );
 
-    //painting elements
+    const availableOrangeCharacters = this.calculateAvailableOrangeCharacters(
+      userWord,
+      computerWord
+    );
+
     for (let i = 0; i < userWord.length; i++) {
-      if (!computerWord.includes(userWord[i])) {
+      const currentLetter = userWordHtml[i] as HTMLDivElement;
+
+      if (userWord[i] === computerWord[i]) {
+        currentLetter.style.background = 'green';
+        availableOrangeCharacters[userWord[i]] -= 1;
         continue;
       }
-      (userWordHtml[i] as HTMLDivElement).style.background =
-        userWord[i] === computerWord[i] ? 'green' : 'orange';
+
+      if (availableOrangeCharacters[userWord[i]] >= 1) {
+        currentLetter.style.background = 'orange';
+        availableOrangeCharacters[userWord[i]] -= 1;
+      }
     }
   }
 
-  //to do: implement limit for amount of orange characters
+  private calculateAvailableOrangeCharacters(
+    userWord: string,
+    computerWord: string
+  ): { [key: string]: number } {
+    const characterMap: { [key: string]: number } = {};
+
+    for (let i = 0; i < computerWord.length; i++) {
+      if (!computerWord.includes(userWord[i])) {
+        continue;
+      }
+
+      const computerCharacter = computerWord[i];
+
+      if (characterMap[computerCharacter]) {
+        // If the character is already a key, increment its value.
+        characterMap[computerCharacter]++;
+        continue;
+      }
+
+      // If the character is not a key, add it with a value of 1.
+      characterMap[computerCharacter] = 1;
+    }
+
+    return characterMap;
+  }
 }

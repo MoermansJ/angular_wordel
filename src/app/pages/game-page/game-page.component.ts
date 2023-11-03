@@ -13,7 +13,6 @@ export class GamePageComponent implements OnInit {
   //properties
   public computerWordCharArray: string[] = [];
   public computerWord: string = '';
-  public userWord: string = '';
   public wordDetails: Element | null = null;
   public inputValues: string[] = [];
   public attemptCounter: number = 7;
@@ -62,13 +61,15 @@ export class GamePageComponent implements OnInit {
       return;
     }
 
+    const userWord = this.inputValues.join('').toUpperCase();
+
     //creating div elements based on user word
     this.attemptCounter--;
     const wordGrid = this.el.nativeElement.querySelector('#word-grid');
 
-    for (let i = 0; i < this.inputValues.length; i++) {
+    for (let i = 0; i < userWord.length; i++) {
       const divToAppend = this.renderer.createElement('div') as HTMLDivElement;
-      divToAppend.textContent = this.inputValues[i];
+      divToAppend.textContent = userWord[i];
       divToAppend.style.gridColumn = (i + 1).toString(); //css-grid starts at 1, not 0
       divToAppend.style.gridRow = (this.attemptCounter - 1).toString(); //placing most recent input ontop
       this.renderer.appendChild(wordGrid, divToAppend);
@@ -77,14 +78,14 @@ export class GamePageComponent implements OnInit {
     //resetting input fields for UX
 
     //painting user word div elements
-    this.gameService.appendUserWord(
-      this.inputValues.join(''),
-      this.attemptCounter
-    );
+    this.gameService.appendUserWord(userWord, this.attemptCounter);
+
+    console.log(userWord);
+    console.log(this.computerWord);
 
     this.gameService.paintAppendedWord(
       this.attemptCounter,
-      this.inputValues.join(''),
+      userWord,
       this.computerWord
     );
 
@@ -102,6 +103,10 @@ export class GamePageComponent implements OnInit {
     //   targetElement,
     //   this.wordService.getWordDetails(this.computerWord)
     // );
+
+    if (userWord === this.computerWord) {
+      console.log('you won, congratulations');
+    }
   }
 
   private fetchWordBeginningWith(randomCharacter: string): Observable<string> {
@@ -130,16 +135,9 @@ export class GamePageComponent implements OnInit {
   ): void {
     //going backward
     if (key === 'BACKSPACE' || key === 'DELETE') {
-      // element.value = '';
-
       if (elementIndex <= 0) {
         return;
       }
-
-      // if (element.value !== '') {
-      //   element.value = '';
-      //   return;
-      // }
 
       const previousInputId = 'char-input-' + (elementIndex - 1);
       const previousInput = document.getElementById(
