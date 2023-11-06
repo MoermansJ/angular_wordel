@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,25 +10,21 @@ export class WordService {
   //properties
 
   //constructor
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private dataService: DataService) {}
 
   //custom methods
-  public getWordDetails(word: string): Element {
-    let wordDetailsHtml: Element = {} as Element;
-
+  public getWordDetails(word: string): void {
     this.fetchWordDetails(word).subscribe({
       next: (response: string) => {
-        let parsedHTML = new DOMParser().parseFromString(response, 'text/html');
-        const externalHTML = Array.from(
-          parsedHTML.querySelector('.right')?.children as HTMLCollection
-        )[1];
-        wordDetailsHtml = externalHTML;
+        let parsedHtml = new DOMParser().parseFromString(response, 'text/html');
+        const externalHtml = Array.from(
+          parsedHtml.querySelector('.right')?.children as HTMLCollection
+        )[1] as HTMLDivElement;
+        this.dataService.setWordDetails(externalHtml);
       },
 
       error: (error) => console.log(error),
     });
-
-    return wordDetailsHtml;
   }
 
   private fetchWordDetails(word: string): Observable<string> {

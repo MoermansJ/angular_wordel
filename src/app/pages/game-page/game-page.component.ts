@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
 import { Observable } from 'rxjs';
+import { DataService } from 'src/app/services/data.service';
 import { GameService } from 'src/app/services/game.service';
 import { WordService } from 'src/app/services/word.service';
 
@@ -13,6 +14,7 @@ export class GamePageComponent implements OnInit {
   //properties
   public computerWordCharArray: string[] = [];
   public computerWord: string = '';
+  public showWordDetails: boolean = false;
   public wordDetails: Element | null = null;
   public inputValues: string[] = [];
   public attemptCounter: number = 7;
@@ -22,12 +24,22 @@ export class GamePageComponent implements OnInit {
     private renderer: Renderer2,
     private el: ElementRef,
     private gameService: GameService,
-    private http: HttpClient
+    private http: HttpClient,
+    private wordService: WordService,
+    private dataService: DataService
   ) {}
 
   //custom methods
   public ngOnInit(): void {
     this.getRandomWord();
+
+    //subscribing to dataservice
+    this.dataService.getWordDetails().subscribe((externalHtml) => {
+      this.wordDetails = externalHtml;
+      const parent = document.getElementById('external-html');
+
+      if (externalHtml) this.renderer.appendChild(parent, externalHtml);
+    });
   }
 
   public getRandomWord(): void {
@@ -75,37 +87,22 @@ export class GamePageComponent implements OnInit {
       this.renderer.appendChild(wordGrid, divToAppend);
     }
 
-    //resetting input fields for UX
-
     //painting user word div elements
     this.gameService.appendUserWord(userWord, this.attemptCounter);
-
-    console.log(userWord);
-    console.log(this.computerWord);
-
     this.gameService.paintAppendedWord(
       this.attemptCounter,
       userWord,
       this.computerWord
     );
 
+    //resetting input fields for UX
     this.inputValues = [];
 
-    // const targetElement = this.renderer.selectRootElement(
-    //   '#external-html'
-    // ) as HTMLElement;
-
-    // //clearing previous html
-    // this.renderer.setProperty(targetElement, 'innerHTML', '');
-
-    //appending html
-    // this.renderer.appendChild(
-    //   targetElement,
-    //   this.wordService.getWordDetails(this.computerWord)
-    // );
-
+    //checking for victory
     if (userWord === this.computerWord) {
       console.log('you won, congratulations');
+      this.wordService.getWordDetails(this.computerWord);
+      this.showWordDetails = true;
     }
   }
 
@@ -121,46 +118,35 @@ export class GamePageComponent implements OnInit {
     switch (key) {
       case 'BACKSPACE':
       case 'DELETE':
-        this.jumpToPrevious(key, currentElement, currentIndex);
+        this.jumpToPrevious(key, currentIndex);
         break;
       default:
-        this.jumpToNext(key, currentElement, currentIndex);
+        this.jumpToNext(key, currentIndex);
     }
   }
 
-  private jumpToPrevious(
-    key: string,
-    element: HTMLInputElement,
-    elementIndex: number
-  ): void {
+  private jumpToPrevious(key: string, elementIndex: number): void {
     //going backward
-    if (key === 'BACKSPACE' || key === 'DELETE') {
-      if (elementIndex <= 0) {
-        return;
-      }
-
-      const previousInputId = 'char-input-' + (elementIndex - 1);
-      const previousInput = document.getElementById(
-        previousInputId
-      ) as HTMLInputElement;
-
-      previousInput.focus();
+    if (elementIndex <= 0) {
+      return;
     }
+
+    const previousInputId = 'char-input-' + (elementIndex - 1);
+    const previousInput = document.getElementById(
+      previousInputId
+    ) as HTMLInputElement;
+
+    previousInput.focus();
   }
 
-  private jumpToNext(
-    key: string,
-    element: HTMLInputElement,
-    elementIndex: number
-  ): void {
+  private jumpToNext(key: string, elementIndex: number): void {
     //check if the pressed key matches regex AND pressed key is a character
     const regex: RegExp = /[A-Z]/; //A - Z
     if (!regex.test(key) || key.length >= 2) {
       return;
     }
 
-    // element.value = key;
-
+    //if user didn't enter enough characters
     if (elementIndex === this.computerWord.length - 1) {
       return;
     }
